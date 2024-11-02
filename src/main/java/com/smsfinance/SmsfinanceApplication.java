@@ -1,4 +1,4 @@
-package com.smsfinance.smsfinance;
+package com.smsfinance;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
