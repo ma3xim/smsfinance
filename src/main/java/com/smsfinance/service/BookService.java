@@ -24,11 +24,11 @@ public class BookService {
         this.bookEventProducer = bookEventProducer;
     }
 
-    public List<Book> findAllBooks(){
+    public List<Book> findAllBooks() {
         return bookRepository.findAll();
     }
 
-    public Book findById(int id){
+    public Book findById(int id) {
         Optional<Book> book = bookRepository.findById(id);
         return book.orElseThrow(() -> new BookNotFoundException(BOOK_NOT_FOUND));
     }
@@ -52,8 +52,8 @@ public class BookService {
     }
 
     @Transactional
-    public void deleteBook(int id) throws BookNotFoundException{
-        if (bookRepository.findById(id).isEmpty()){
+    public void deleteBook(int id) throws BookNotFoundException {
+        if (bookRepository.findById(id).isEmpty()) {
             throw new BookNotFoundException(BOOK_NOT_FOUND);
         } else {
             bookRepository.deleteById(id);
