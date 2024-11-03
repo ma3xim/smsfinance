@@ -1,6 +1,7 @@
 package com.smsfinance.service;
 
 import com.smsfinance.model.Book;
+import com.smsfinance.rabbitMq.BookEventProducer;
 import com.smsfinance.repository.BookRepository;
 import com.smsfinance.util.exception.BookNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,11 +15,13 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class BookService {
     private final BookRepository bookRepository;
+    private final BookEventProducer bookEventProducer;
     private static final String BOOK_NOT_FOUND = "Книга с таким id не найдена!";
 
     @Autowired
-    public BookService(BookRepository bookRepository) {
+    public BookService(BookRepository bookRepository, BookEventProducer bookEventProducer) {
         this.bookRepository = bookRepository;
+        this.bookEventProducer = bookEventProducer;
     }
 
     public List<Book> findAllBooks(){
@@ -33,6 +36,7 @@ public class BookService {
     @Transactional
     public void saveBook(Book book) {
         bookRepository.save(book);
+        bookEventProducer.sendBookEvent("Книга с названием " + book.getTitle() + " была добавлена. timestamp: ");
     }
 
     @Transactional
@@ -44,6 +48,7 @@ public class BookService {
         existingBook.setPublishedDate(updatedBook.getPublishedDate());
 
         bookRepository.save(existingBook);
+        bookEventProducer.sendBookEvent("Книга с ID " + id + " была обновлена. timestamp: ");
     }
 
     @Transactional
@@ -52,6 +57,7 @@ public class BookService {
             throw new BookNotFoundException(BOOK_NOT_FOUND);
         } else {
             bookRepository.deleteById(id);
+            bookEventProducer.sendBookEvent("Книга с ID " + id + " была удалена. timestamp: ");
         }
     }
 }
